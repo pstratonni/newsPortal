@@ -1,0 +1,61 @@
+from django.contrib.auth.models import User
+
+from news.models import Author, Post, Category, PostCategory, Comment
+
+John_user = User.objects.create_user('John', 'john@email.com', 'johnpassword')
+Ivan_user = User.objects.create_user('Ivan', 'ivan@email.com', 'ivanpassword')
+
+John = Author.objects.create(user=John_user)
+Ivan = Author.objects(user=Ivan_user)
+
+sport = Category.objects.create(category='Спорт')
+politics = Category.objects.create(category='Политика')
+culture = Category.objects.create(category='Культура')
+economy = Category.objects.create(category='Экономика')
+
+article_1 = Post.objects.create(title='Футбол', author=John,
+                                text='Задача организации, в особенности же укрепление и развитие структуры обеспечивает широкому кругу (специалистов) участие в формировании форм развития. Значимость этих проблем настолько очевидна, что рамки и место обучения кадров в значительной степени обуславливает создание существенных финансовых и административных условий. Равным образом укрепление и развитие структуры представляет собой интересный эксперимент проверки существенных финансовых и административных условий. Значимость этих проблем настолько очевидна, что новая модель организационной деятельности требуют определения и уточнения направлений прогрессивного развития.')
+article_2 = Post.objects.create(title='Путин', author=Ivan,
+                                text='Задача организации, в особенности же укрепление и развитие структуры обеспечивает широкому кругу (специалистов) участие в формировании форм развития. Значимость этих проблем настолько очевидна, что рамки и место обучения кадров в значительной степени обуславливает создание существенных финансовых и административных условий. Равным образом укрепление и развитие структуры представляет собой интересный эксперимент проверки существенных финансовых и административных условий. Значимость этих проблем настолько очевидна, что новая модель организационной деятельности требуют определения и уточнения направлений прогрессивного развития.')
+news_1 = Post.objects.create(title='Кризис', author=John, article_or_news=Post.news,
+                             text='Не следует, однако забывать, что дальнейшее развитие различных форм деятельности позволяет выполнять важные задания по разработке модели развития. Идейные соображения высшего порядка, а также постоянное информационно-пропагандистское обеспечение нашей деятельности влечет за собой процесс внедрения и модернизации дальнейших направлений развития. Значимость этих проблем настолько очевидна, что постоянное информационно-пропагандистское обеспечение нашей деятельности в значительной степени обуславливает создание существенных финансовых и административных условий.')
+
+PostCategory.objects.create(posts=article_1, categories=sport)
+PostCategory.objects.create(posts=article_2, categories=politics)
+PostCategory.objects.create(posts=article_2, categories=economy)
+PostCategory.objects.create(posts=news_1, categories=politics)
+PostCategory.objects.create(posts=news_1, categories=economy)
+
+comment_1 = Comment.objects.create(posts=article_1, users=Ivan_user, text='commnet to article_1 from Ivan')
+comment_2 = Comment.objects.create(posts=article_2, users=Ivan_user, text='commnet to article_2 from Ivan')
+comment_3 = Comment.objects.create(posts=article_2, users=John_user, text='commnet to article_2 from John')
+comment_4 = Comment.objects.create(posts=news_1, users=John_user, text='commnet to news_1 from John')
+
+comment_1.comment_like()
+comment_2.comment_like()
+comment_2.comment_dislike()
+article_1.post_like()
+article_2.post_like()
+article_2.post_like()
+news_1.post_dislike()
+
+John.update_rating()
+Ivan.update_rating()
+
+best_user = Author.objects.all().order_by('author_rating')[-1]
+best_user.username
+
+best_article = Post.objects.filter(article_or_post=Post.article).order_by('-post_rating')[0]
+best_article.date_created
+best_article.author.user.username
+best_article.post_rating
+best_article.title
+best_article.preview()
+
+comments_to_best_article=Comment.objects.filter(posts=best_article)
+for comment in comments_to_best_article:
+    comment.date_created
+    comment.users.username
+    comment.comment_rating
+    comment.text
+    print('')
